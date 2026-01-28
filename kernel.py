@@ -1,6 +1,6 @@
 ### Fill in the following information before submitting
-# Group id: 
-# Members: Kenneth Albarillo, 
+# Group id: 13
+# Members: Kenneth Albarillo, Alejandro Olivares-Lopez, Benson Manzano
 
 from collections import deque
 
@@ -43,11 +43,14 @@ class Kernel:
     def new_process_arrived(self, new_process: PID) -> PID:
         next_pid = PCB(new_process)
         self.ready_queue.append(next_pid)
+        if self.running.pid == 0:
+            self.running = self.choose_next_process()
         return self.running.pid
 
     # This method is triggered every time the current process performs an exit syscall.
     # DO NOT rename or delete this method. DO NOT change its arguments.
     def syscall_exit(self) -> PID:
+        self.running = self.choose_next_process()
         return self.running.pid
     
 
@@ -60,8 +63,9 @@ class Kernel:
                 return self.idle_pcb
         
         if self.scheduling_algorithm == "FCFS":
-            self.running = self.idle_pcb
+            return self.ready_queue.popleft()
         else:
             print("Unknown scheduling algorithm")
+            return self.idle_pcb
         
 
